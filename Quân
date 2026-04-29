@@ -22,7 +22,6 @@ guiFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 guiFrame.BorderSizePixel = 0
 guiFrame.Parent = guiScreen
 
-
 local autoFarmToggle = Instance.new("TextButton")
 autoFarmToggle.Size = UDim2.new(0, 180, 0, 30)
 autoFarmToggle.Position = UDim2.new(0.5, -90, 0, 10)
@@ -42,8 +41,9 @@ autoFarmToggle.MouseButton1Click:Connect(function()
         spawn(function()
             while autoFarmActive do
                 for i, v in pairs(workspace:GetChildren()) do
-                    if v.ClassName == "Model" and v:FindFirstChild("Container") or v.Name == "PortCraneOversized" then
-                        v:Destroy()
+                    -- Sửa lại ưu tiên phép toán logic để đúng ý bạn
+                    if (v.ClassName == "Model" and v:FindFirstChild("Container")) or v.Name == "PortCraneOversized" then
+                        pcall(function() v:Destroy() end)
                     end
                 end
                 wait(1)
@@ -51,39 +51,58 @@ autoFarmToggle.MouseButton1Click:Connect(function()
         end)
         spawn(function()
             while autoFarmActive do
-                local hum = game.Players.LocalPlayer.Character.Humanoid
-                local car = hum.SeatPart.Parent
-                car.PrimaryPart = car.Body:FindFirstChild("#Weight")
-                if not getfenv().first then
-                    if workspace.Workspace:FindFirstChild("Buildings") then
-                        workspace.Workspace.Buildings:Destroy()
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+                if character and character:FindFirstChild("Humanoid") then
+                    local hum = character.Humanoid
+                    if hum.SeatPart and hum.SeatPart.Parent then
+                        local car = hum.SeatPart.Parent
+                        if car:FindFirstChild("Body") and car.Body:FindFirstChild("#Weight") then
+                            car.PrimaryPart = car.Body:FindFirstChild("#Weight")
+                        end
+                        -- Kiểm tra getfenv trước khi dùng
+                        if not getfenv().first then
+                            if workspace:FindFirstChild("Buildings") then
+                                pcall(function() workspace.Buildings:Destroy() end)
+                            end
+                            car:PivotTo(CFrame.new(Vector3.new(-7594.541, -3.51385, 5130.9526), Vector3.new(-6205.2983, -3.50301, 8219.8535)))
+                            wait(0.1)
+                        end
+                        if car.PrimaryPart then
+                            car.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
+                        end
+                        getfenv().first = true
+                        local location = Vector3.new(-6205.2983, 100, 8219.8535)
+                        repeat
+                            task.wait()
+                            local mathlock = 550
+                            if car.PrimaryPart then
+                                car.PrimaryPart.Velocity = car.PrimaryPart.CFrame.LookVector * mathlock
+                                car:PivotTo(CFrame.new(car.PrimaryPart.Position, location))
+                            end
+                        until (player:DistanceFromCharacter(location) < 50 or not autoFarmActive)
+                        if car.PrimaryPart then
+                            car.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
+                        end
+                        location = Vector3.new(-7594.541, 100, 5130.9526)
+                        repeat
+                            task.wait()
+                            local mathlock = 550
+                            if car.PrimaryPart then
+                                car.PrimaryPart.Velocity = car.PrimaryPart.CFrame.LookVector * mathlock
+                                car:PivotTo(CFrame.new(car.PrimaryPart.Position, location))
+                            end
+                        until (player:DistanceFromCharacter(location) < 50 or not autoFarmActive)
+                        if car.PrimaryPart then
+                            car.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
+                        end
                     end
-                    car:PivotTo(CFrame.new(Vector3.new(-7594.541015625, -3.513848304748535, 5130.95263671875), Vector3.new(-6205.29833984375, -3.5030133724212646, 8219.853515625)))
-                    wait(0.1)
                 end
-                car.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
-                getfenv().first = true
-                local location = Vector3.new(-6205.29833984375, 100, 8219.853515625)
-                repeat
-                    task.wait()
-                    mathlock = 550
-                    car.PrimaryPart.Velocity = car.PrimaryPart.CFrame.LookVector * mathlock
-                    car:PivotTo(CFrame.new(car.PrimaryPart.Position, location))
-                until game.Players.LocalPlayer:DistanceFromCharacter(location) < 50 or not autoFarmActive
-                car.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
-                location = Vector3.new(-7594.541015625, 100, 5130.95263671875)
-                repeat
-                    task.wait()
-                    mathlock = 550
-                    car.PrimaryPart.Velocity = car.PrimaryPart.CFrame.LookVector * mathlock
-                    car:PivotTo(CFrame.new(car.PrimaryPart.Position, location))
-                until game.Players.LocalPlayer:DistanceFromCharacter(location) < 50 or not autoFarmActive
-                car.PrimaryPart.Velocity = Vector3.new(0, 0, 0)
             end
         end)
     else
         autoFarmToggle.Text = "Auto Farm: OFF"
-        -- Stop Auto Farm functionality here
+        -- Auto farm sẽ dừng nhờ flag autoFarmActive = false
     end
 end)
 
@@ -118,4 +137,6 @@ blackScreenToggle.MouseButton1Click:Connect(function()
         if blackScreen then
             blackScreen:Destroy()
         end
-        blackScreenToggle.Text = "Black Screen:
+        blackScreenToggle.Text = "Black Screen: OFF"
+    end
+end)
