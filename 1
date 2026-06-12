@@ -1,6 +1,124 @@
 import pyautogui
 import time
+from pynput import keyboard
 
-while True:
-    pyautogui.press('space')
-    time.sleep(1)
+# Cấu hình ban đầu
+speed = 0.1  # Khoảng thời gian giữa các lần nhấn (giây)
+running = False
+current_key = 'space'
+attack_mode = 'normal'  # 'normal', 'atiban', 'combo'
+
+def on_press(key):
+    global speed, running, current_key, attack_mode
+    
+    try:
+        if key == keyboard.Key.esc:
+            # ESC - Thoát chương trình
+            print("\nThoát chương trình!")
+            return False
+        
+        if key == keyboard.Key.f6:
+            # F6 - Bắt đầu/Dừng
+            running = not running
+            status = "Đang chạy" if running else "Đã dừng"
+            print(f"[{status}] Tốc độ: {speed:.2f}s | Chế độ: {attack_mode}")
+        
+        if key == keyboard.Key.f7:
+            # F7 - Tăng tốc độ (giảm thời gian)
+            speed = max(0.01, speed - 0.01)
+            print(f"Tăng tốc độ -> {speed:.2f}s")
+        
+        if key == keyboard.Key.f8:
+            # F8 - Giảm tốc độ (tăng thời gian)
+            speed = min(10, speed + 0.01)
+            print(f"Giảm tốc độ -> {speed:.2f}s")
+        
+        if key == keyboard.Key.f9:
+            # F9 - Reset tốc độ về 0.1s
+            speed = 0.1
+            print(f"Reset tốc độ -> {speed:.2f}s")
+        
+        if key == keyboard.Key.f10:
+            # F10 - Chế độ thường (Đánh thường)
+            attack_mode = 'normal'
+            print(f"Chuyển sang chế độ: {attack_mode}")
+        
+        if key == keyboard.Key.f11:
+            # F11 - Chế độ Atiban (Đánh nhanh liên tục)
+            attack_mode = 'atiban'
+            print(f"Chuyển sang chế độ: {attack_mode}")
+        
+        if key == keyboard.Key.f12:
+            # F12 - Chế độ Combo (Kết hợp)
+            attack_mode = 'combo'
+            print(f"Chuyển sang chế độ: {attack_mode}")
+            
+    except AttributeError:
+        pass
+
+def normal_attack():
+    """Đánh thường"""
+    pyautogui.press(current_key)
+
+def atiban_attack():
+    """Đánh nhanh liên tục (Atiban)"""
+    # Đánh 3 cái nhanh liên tục
+    for _ in range(3):
+        pyautogui.press(current_key)
+        time.sleep(speed * 0.3)
+
+def combo_attack():
+    """Combo đánh (kết hợp nhanh và chậm)"""
+    # Đánh 2 cái nhanh
+    for _ in range(2):
+        pyautogui.press(current_key)
+        time.sleep(speed * 0.2)
+    # Chờ một chút
+    time.sleep(speed * 0.5)
+    # Đánh 1 cái mạnh
+    pyautogui.press(current_key)
+
+def listener():
+    with keyboard.Listener(on_press=on_press) as listen:
+        listen.join()
+
+if __name__ == "__main__":
+    print("=" * 60)
+    print("Script Điều Khiển Tốc Độ Đánh Kiếm (Atiban)")
+    print("=" * 60)
+    print("\nPhím Điều Khiển Chế Độ:")
+    print("  F10 - Chế độ Thường (Đánh thường)")
+    print("  F11 - Chế độ Atiban (Đánh nhanh liên tục)")
+    print("  F12 - Chế độ Combo (Kết hợp)")
+    print("\nPhím Điều Khiển Tốc Độ:")
+    print("  F6 - Bắt đầu/Dừng")
+    print("  F7 - Tăng tốc độ (-0.01s)")
+    print("  F8 - Giảm tốc độ (+0.01s)")
+    print("  F9 - Reset tốc độ (0.1s)")
+    print("  ESC - Thoát chương trình")
+    print("\nTốc độ ban đầu: 0.1s")
+    print("Phím nhấn: SPACE")
+    print("Chế độ ban đầu: normal")
+    print("=" * 60 + "\n")
+    
+    # Khởi động listener trong một thread riêng
+    import threading
+    listener_thread = threading.Thread(target=listener, daemon=True)
+    listener_thread.start()
+    
+    try:
+        while True:
+            if running:
+                if attack_mode == 'normal':
+                    normal_attack()
+                elif attack_mode == 'atiban':
+                    atiban_attack()
+                elif attack_mode == 'combo':
+                    combo_attack()
+                
+                time.sleep(speed)
+            else:
+                time.sleep(0.01)
+    
+    except KeyboardInterrupt:
+        print("\nDừng chương trình!")
