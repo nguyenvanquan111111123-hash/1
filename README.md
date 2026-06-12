@@ -369,7 +369,7 @@ local function createMainWindow()
     -- Load Fluent
     local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
     
-    local Window = Fluent:CreateWindow({
+    Window = Fluent:CreateWindow({
         Title=" VanQuan ",
         SubTitle="Blox Fruit",
         TabWidth=157,
@@ -495,7 +495,7 @@ function toggleMenu()
 end
 
 repeat task.wait() until game:IsLoaded()
-Window = createMainWindow()
+createMainWindow()
 startRainbowEffect(Window.Root, 0.2)
 
 print("✓ Script loaded successfully! Enjoy!")
