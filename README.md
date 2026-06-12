@@ -490,6 +490,9 @@ local function toggleMenu()
     else
         -- Show menu and hide avatar
         menuVisible = true
+        if toggleConnection then
+            toggleConnection:Disconnect()
+        end
         if avatarContainer and avatarContainer.Parent then
             avatarContainer:Destroy()
             avatarContainer = nil
