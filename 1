@@ -6,7 +6,7 @@ from pynput import keyboard
 speed = 0.1  # Khoảng thời gian giữa các lần nhấn (giây)
 running = False
 current_key = 'space'
-attack_mode = 'normal'  # 'normal', 'atiban', 'combo'
+attack_mode = 'normal'  # 'normal', 'atiban', 'combo', 'jump_attack', 'range_attack'
 
 def on_press(key):
     global speed, running, current_key, attack_mode
@@ -52,6 +52,16 @@ def on_press(key):
             # F12 - Chế độ Combo (Kết hợp)
             attack_mode = 'combo'
             print(f"Chuyển sang chế độ: {attack_mode}")
+        
+        if key == keyboard.Key.f1:
+            # F1 - Chế độ Bay lên đầu boss (Jump Attack)
+            attack_mode = 'jump_attack'
+            print(f"Chuyển sang chế độ: {attack_mode}")
+        
+        if key == keyboard.Key.f2:
+            # F2 - Chế độ Đánh xa (Range Attack)
+            attack_mode = 'range_attack'
+            print(f"Chuyển sang chế độ: {attack_mode}")
             
     except AttributeError:
         pass
@@ -78,28 +88,60 @@ def combo_attack():
     # Đánh 1 cái mạnh
     pyautogui.press(current_key)
 
+def jump_attack():
+    """Bay lên đầu boss - Nhảy + Đánh"""
+    # Nhảy lên (giả định Space để nhảy)
+    pyautogui.press('space')
+    time.sleep(speed * 0.5)
+    # Đánh khi đang ở trên không trung
+    pyautogui.press(current_key)
+    time.sleep(speed * 0.2)
+    # Đánh lần thứ 2
+    pyautogui.press(current_key)
+    time.sleep(speed * 0.2)
+    # Đánh lần thứ 3 mạnh
+    pyautogui.press(current_key)
+
+def range_attack():
+    """Đánh xa - Sử dụng phím khác hoặc combo đặc biệt"""
+    # Thường trong game, đánh xa dùng phím khác như 'e' hoặc 'q'
+    # Đây là combo đánh từ xa:
+    
+    # Nhấn phím đánh xa (giả định 'e')
+    pyautogui.press('e')
+    time.sleep(speed * 0.3)
+    # Tiếp theo đánh thường
+    pyautogui.press(current_key)
+    time.sleep(speed * 0.2)
+    # Đánh lần nữa
+    pyautogui.press(current_key)
+
 def listener():
     with keyboard.Listener(on_press=on_press) as listen:
         listen.join()
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("Script Điều Khiển Tốc Độ Đánh Kiếm (Atiban)")
-    print("=" * 60)
-    print("\nPhím Điều Khiển Chế Độ:")
+    print("=" * 70)
+    print("Script Điều Khiển Tốc Độ Đánh Kiếm (Atiban + Boss Combat)")
+    print("=" * 70)
+    print("\n🎯 Phím Điều Khiển Chế Độ Tấn Công:")
     print("  F10 - Chế độ Thường (Đánh thường)")
     print("  F11 - Chế độ Atiban (Đánh nhanh liên tục)")
-    print("  F12 - Chế độ Combo (Kết hợp)")
-    print("\nPhím Điều Khiển Tốc Độ:")
+    print("  F12 - Chế độ Combo (Kết hợp nhanh + mạnh)")
+    print("  F1  - Chế độ Bay lên đầu Boss (Nhảy + Đánh)")
+    print("  F2  - Chế độ Đánh Xa (Combo đánh từ xa)")
+    print("\n⚙️  Phím Điều Khiển Tốc Độ:")
     print("  F6 - Bắt đầu/Dừng")
     print("  F7 - Tăng tốc độ (-0.01s)")
     print("  F8 - Giảm tốc độ (+0.01s)")
     print("  F9 - Reset tốc độ (0.1s)")
     print("  ESC - Thoát chương trình")
-    print("\nTốc độ ban đầu: 0.1s")
-    print("Phím nhấn: SPACE")
-    print("Chế độ ban đầu: normal")
-    print("=" * 60 + "\n")
+    print("\n📊 Thông tin mặc định:")
+    print("  Tốc độ ban đầu: 0.1s")
+    print("  Phím nhấn: SPACE")
+    print("  Chế độ ban đầu: normal")
+    print("  Phím đánh xa: E (có thể thay đổi)")
+    print("=" * 70 + "\n")
     
     # Khởi động listener trong một thread riêng
     import threading
@@ -115,6 +157,10 @@ if __name__ == "__main__":
                     atiban_attack()
                 elif attack_mode == 'combo':
                     combo_attack()
+                elif attack_mode == 'jump_attack':
+                    jump_attack()
+                elif attack_mode == 'range_attack':
+                    range_attack()
                 
                 time.sleep(speed)
             else:
