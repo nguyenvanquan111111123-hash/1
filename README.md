@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
 -- ===== KEY VERIFICATION SYSTEM =====
-local correctKey = "Quỳnh"
+local correctKey = "1234"
 local keyVerified = false
 
 -- Create key verification GUI
