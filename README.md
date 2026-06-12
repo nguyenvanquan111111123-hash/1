@@ -292,11 +292,6 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 -- Store player avatar
 local playerAvatarUrl = "https://www.roblox.com/bust-thumbnails/image?userId=" .. player.UserId .. "&width=420&height=420&format=Png"
 
-local toggleConnection
-local menuVisible = true
-local avatarContainer = nil
-
--- ===== RAINBOW EFFECT FOR MAIN MENU =====
 local rainbowColorsUI = {
     Color3.fromRGB(255, 0, 0),
     Color3.fromRGB(255, 127, 0),
@@ -307,36 +302,27 @@ local rainbowColorsUI = {
     Color3.fromRGB(148, 0, 211)
 }
 
-local function startRainbowEffect(window)
-    if toggleConnection then
-        toggleConnection:Disconnect()
+local menuVisible = true
+local avatarContainer = nil
+local rainbowConnection = nil
+local Window = nil
+
+-- ===== RAINBOW EFFECT FUNCTION =====
+local function startRainbowEffect(element, speed)
+    if rainbowConnection then
+        rainbowConnection:Disconnect()
     end
     
-    toggleConnection = RunService.Heartbeat:Connect(function()
-        if menuVisible and window and window.Root and window.Root.Parent then
-            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
-            window.Root.BorderColor3 = rainbowColorsUI[colorIndex]
-            window.Root.BorderSizePixel = 3
+    rainbowConnection = RunService.Heartbeat:Connect(function()
+        if element and element.Parent then
+            local colorIndex = math.floor(tick() / (speed or 0.2)) % 7 + 1
+            element.BorderColor3 = rainbowColorsUI[colorIndex]
         end
     end)
 end
 
--- Rainbow effect on avatar border
-local function startAvatarRainbowEffect()
-    if toggleConnection then
-        toggleConnection:Disconnect()
-    end
-    
-    toggleConnection = RunService.Heartbeat:Connect(function()
-        if not menuVisible and avatarContainer and avatarContainer.Parent then
-            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
-            avatarContainer.BorderColor3 = rainbowColorsUI[colorIndex]
-        end
-    end)
-end
-
--- Create avatar button with rainbow border AND click handler
-local function createAvatarButton(toggleMenuFunc)
+-- Create avatar button with rainbow border
+local function createAvatarButton()
     avatarContainer = Instance.new("Frame")
     avatarContainer.Name = "AvatarContainer"
     avatarContainer.Parent = ScreenGui
@@ -345,6 +331,7 @@ local function createAvatarButton(toggleMenuFunc)
     avatarContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     avatarContainer.BorderSizePixel = 3
     avatarContainer.BorderColor3 = Color3.fromRGB(0, 255, 255)
+    avatarContainer.ZIndex = 10
     
     -- Corner radius for container
     local corner = Instance.new("UICorner")
@@ -358,18 +345,22 @@ local function createAvatarButton(toggleMenuFunc)
     avatarLabel.Size = UDim2.new(1, 0, 1, 0)
     avatarLabel.BackgroundTransparency = 1
     avatarLabel.Image = playerAvatarUrl
+    avatarLabel.ZIndex = 9
     
     -- Make avatar circular
     local avatarCorner = Instance.new("UICorner")
     avatarCorner.CornerRadius = UDim.new(1, 0)
     avatarCorner.Parent = avatarLabel
     
-    -- ADD CLICK HANDLER IMMEDIATELY
+    -- ADD CLICK HANDLER
     avatarContainer.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            toggleMenuFunc()
+            toggleMenu()
         end
     end)
+    
+    -- Start rainbow effect for avatar
+    startRainbowEffect(avatarContainer, 0.2)
     
     return avatarContainer
 end
@@ -470,28 +461,25 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/OhhMyGehlee/Sol14/ref
     return Window
 end
 
-local Window
-
 -- Toggle function
-local function toggleMenu()
+function toggleMenu()
     if menuVisible then
         -- Hide menu and show avatar
         menuVisible = false
-        if toggleConnection then
-            toggleConnection:Disconnect()
+        if rainbowConnection then
+            rainbowConnection:Disconnect()
         end
         
         if Window and Window.Root then
             Window.Root.Visible = false
         end
         
-        createAvatarButton(toggleMenu)
-        startAvatarRainbowEffect()
+        createAvatarButton()
     else
         -- Show menu and hide avatar
         menuVisible = true
-        if toggleConnection then
-            toggleConnection:Disconnect()
+        if rainbowConnection then
+            rainbowConnection:Disconnect()
         end
         if avatarContainer and avatarContainer.Parent then
             avatarContainer:Destroy()
@@ -502,12 +490,12 @@ local function toggleMenu()
             Window.Root.Visible = true
         end
         
-        startRainbowEffect(Window)
+        startRainbowEffect(Window.Root, 0.2)
     end
 end
 
 repeat task.wait() until game:IsLoaded()
 Window = createMainWindow()
-startRainbowEffect(Window)
+startRainbowEffect(Window.Root, 0.2)
 
 print("✓ Script loaded successfully! Enjoy!")
