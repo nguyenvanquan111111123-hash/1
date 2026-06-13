@@ -416,6 +416,10 @@ local function createMainWindow()
     Tabs.Main1:AddButton({Title="QuantumOnyx",Callback=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
     end})
+	
+    Tabs.Main1:AddButton({Title="isnahamzah",Callback=function()
+      loadstring(game:HttpGet("https://isnahamzah.site/SubscribeYTisnahamzah/ghub2026.lua"))()
+    end})
 
     Tabs.Main1:AddButton({Title="Xeter v4",Callback=function()
         getgenv().Version = "V4"
@@ -499,3 +503,4 @@ createMainWindow()
 startRainbowEffect(Window.Root, 0.2)
 
 print("✓ Script loaded successfully! Enjoy!")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium"))()
