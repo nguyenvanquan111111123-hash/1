@@ -439,6 +439,14 @@ local function createMainWindow()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))()
     end})
 
+    Tabs.Main1:AddButton({Title="Tày hub",Callback=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/VTDROBLOX/Animehub/refs/heads/main/Tayhub-PREMIUM.lua"))()
+	end})
+
+    Tabs.Main1:AddButton({Title="Tay Hub",Callback=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/VTDROBLOX/Animehub/refs/heads/main/Tayhub.lua"))()
+    end})
+	
     -- Tab 2 - SET AS DEFAULT
     Tabs.Main2:AddButton({Title="Tekkit hub",Callback=function()
         loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"))()
